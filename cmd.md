@@ -1,7 +1,7 @@
 #项目命令
 
 ##安装express生成器
-> npm install express-genertor -g
+> npm install express-generator -g
 
 ##生成项目
 > express -e ZYTodoList
@@ -16,8 +16,8 @@
 > {"directory":"./public/lib"}
 
 ##安装前端框架
-> bower install angular --save
-> bower install jquery --save
+> bower install angular --save <br/>
+> bower install jquery --save <br/>
 > bower install bootstrap --save
 
 ##初始化git仓库
