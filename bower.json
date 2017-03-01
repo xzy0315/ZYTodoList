@@ -1,0 +1,22 @@
+{
+  "name": "zytodolist",
+  "description": "",
+  "main": "",
+  "authors": [
+    "xiongzhaoyang <xiongzhaoyang@infinibase.cn>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.2",
+    "jquery": "^3.1.1",
+    "bootstrap": "^3.3.7"
+  }
+}
