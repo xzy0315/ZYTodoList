@@ -1,17 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="todoModule">
   <head>
     <title>todolist</title>
       <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
       <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
-      <link rel="stylesheet" href="../public/lib/bootstrap/dist/css/bootstrap.css"/>
       <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css"/>
   </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+  <body style="margin-top: 50px">
+      <div class="container" ng-controller="todoCtrl">
+          <div class="jumbotron text-center">
+              <h1><label class="label label-info">您有{{todos.length}}个待办事项</label></h1>
+          </div>
+          <div class="row">
+              <div class="col-md-offset-4 col-md-4">
+                  <div class="checkbox" ng-repeat="todo in todos">
+                      <label>
+                          <input type="checkbox" ng-click="isSelect(todo._id)"> {{todo.text}}
+                          <span class="glyphicon glyphicon-trash" ng-click="delete(todo._id)"></span>
+                      </label>
+                  </div>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-md-offset-2 col-md-8 text-center">
+                  <form>
+                      <div class="form-group">
+                          <label for="text">新的事项</label>
+                          <input type="text" id="text" class="form-control" ng-model="todo.text">
+                      </div>
+                      <div class="form-group">
+                          <button class="btn btn-primary" ng-click="addTodo()">增加</button>
+                          <button class="btn btn-primary" ng-click="batchDelete()">批量删除</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
   </body>
   <script src="/lib/jquery/dist/jquery.js"></script>
   <script src="/lib/bootstrap/dist/js/bootstrap.js"></script>
   <script src="/lib/angular/angular.js"></script>
+  <script>
+      angular.module('todoModule',[]);
+
+      angular.module('todoModule').factory('todoService',function($http){
+          return {
+            list:function(){
+                return $http.get('/todos');
+            },
+            add:function(data){
+                //把data放在请求体
+                return $http.post('/todos',data);
+            },
+            delete:function(id){
+                return $http.delete('/todos/delete/'+id);
+            },
+            batchDelete:function(data){
+                return $http.post('/todos/batchDelete',data);
+            }
+          }
+      });
+
+      angular.module('todoModule').controller('todoCtrl',function($scope,todoService){
+        todoService.list().success(function(todos){
+           $scope.todos = todos;
+        });
+        $scope.todos = [];
+        $scope.todo = {};
+
+        $scope.addTodo = function(){
+            if($scope.todo.text) {
+                todoService.add($scope.todo).success(function (todo) {
+                    $scope.todos.push(todo);
+                    $scope.todo = {};
+                });
+            }
+        }
+        $scope.delete = function(id){
+            todoService.delete(id).success(function(result){
+                if(result.code == 1){
+                    $scope.todos = $scope.todos.filter(function(todo){
+                        return todo._id != id;
+                    });
+                }
+            });
+        }
+        $scope.isSelects = [];
+        $scope.isSelect = function(id){
+            var index = $scope.isSelects.indexOf(id);
+            if(index >= 0){
+                $scope.isSelects.splice(index,1);
+            }else{
+                $scope.isSelects.push(id);
+            }
+        }
+
+        $scope.batchDelete = function(){
+            console.log($scope.isSelects);
+            todoService.batchDelete($scope.isSelects).success(function(result){
+                if(result.code == 1){
+                    $scope.todos = $scope.todos.filter(function(todo){
+                        return $scope.isSelects.indexOf(todo._id) == -1;
+                    });
+                }
+            });
+        }
+
+      });
+
+  </script>
 </html>
